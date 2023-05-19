@@ -7,7 +7,7 @@ from dgl.nn.pytorch import GraphConv
 device = torch.device(
     "cuda:{}".format(0) if torch.cuda.is_available() else "cpu"
 )
-device="cpu"
+# device="cpu"
 # print(device)
 
 class VGAEModel(nn.Module):
