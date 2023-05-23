@@ -27,6 +27,39 @@ colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#00
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
 
+def get_subgraphs(G1, G2):
+    # get common nodes
+    nodes1 = set(list(G1.nodes()))
+    # print(nodes1)
+
+    nodes2 = set(list(G2.nodes()))
+    # print(nodes2)
+
+    common_nodes = list(nodes1 & nodes2)
+    print("Num. of common nodes:", len(common_nodes))
+
+    # get subgraphs
+    H1 = G1.subgraph(common_nodes)
+    H2 = G2.subgraph(common_nodes)
+
+    # get common edges
+    edges1 = set(sort_edges(H1.edges()))
+    edges2 = set(sort_edges(H2.edges()))
+
+    e1_inte_e2 = edges1 & edges2
+    print("{} & {}:".format(group1[0], group2[0]), len(e1_inte_e2))
+    # print(list(e1_inte_e2))
+
+    e1_diff_e2 = edges1 - edges2
+    print("{} - {}:".format(group1[0], group2[0]), len(e1_diff_e2))
+    # print(list(e1_diff_e2))
+
+    e2_diff_e1 = edges2 - edges1
+    print("{} - {}:".format(group2[0], group1[0]), len(e2_diff_e1))
+    # print(list(e2_diff_e1))
+
+    return e1_inte_e2, e1_diff_e2, e2_diff_e1
+
 def correlation_labels(df_subgraphs, threshold=0.8):
     conditions = [
         ((df_subgraphs["weight1"] < 0) & (df_subgraphs["weight2"].isnull()) & (df_subgraphs["weight1"] >= threshold)),
