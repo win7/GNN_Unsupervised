@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import plotly
-
+from tqdm import tqdm
 
 colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#006600",
           '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', 'black',"gray"]
@@ -27,7 +27,30 @@ colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#00
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
 
-def get_subgraphs(G1, G2):
+def get_subgraphs(graphs):
+    # get common nodes
+    common_nodes = set(list(graphs[0].nodes()))
+    # print(nodes1)
+    for graph in tqdm(graphs[1:]):
+        nodes = set(list(graph.nodes()))
+        # print(nodes2)
+        common_nodes = common_nodes & nodes
+    # print("Num. of common nodes:", len(common_nodes))
+
+    # get subgraphs
+    G = graphs[0].subgraph(common_nodes)
+    common_edges = set(sort_edges(G.edges()))
+    for graph in tqdm(graphs[1:]):
+        G = graph.subgraph(common_nodes)
+        edges = set(sort_edges(G.edges()))
+        common_edges = common_edges & edges
+    # print("Num. of common edges:", len(common_edges))
+    H = nx.Graph()
+    H.add_edges_from(list(common_edges))
+
+    return G
+
+def get_change_subgraphs(G1, G2, group1, group2):
     # get common nodes
     nodes1 = set(list(G1.nodes()))
     # print(nodes1)
@@ -47,15 +70,15 @@ def get_subgraphs(G1, G2):
     edges2 = set(sort_edges(H2.edges()))
 
     e1_inte_e2 = edges1 & edges2
-    print("{} & {}:".format(group1[0], group2[0]), len(e1_inte_e2))
+    print("{} & {}:".format(group1, group2), len(e1_inte_e2))
     # print(list(e1_inte_e2))
 
     e1_diff_e2 = edges1 - edges2
-    print("{} - {}:".format(group1[0], group2[0]), len(e1_diff_e2))
+    print("{} - {}:".format(group1, group2), len(e1_diff_e2))
     # print(list(e1_diff_e2))
 
     e2_diff_e1 = edges2 - edges1
-    print("{} - {}:".format(group2[0], group1[0]), len(e2_diff_e1))
+    print("{} - {}:".format(group2, group1), len(e2_diff_e1))
     # print(list(e2_diff_e1))
 
     return e1_inte_e2, e1_diff_e2, e2_diff_e1
