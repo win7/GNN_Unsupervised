@@ -45,10 +45,11 @@ def get_subgraphs(graphs):
         edges = set(sort_edges(G.edges()))
         common_edges = common_edges & edges
     # print("Num. of common edges:", len(common_edges))
+
     H = nx.Graph()
     H.add_edges_from(list(common_edges))
 
-    return G
+    return H
 
 def get_change_subgraphs(G1, G2, group1, group2):
     # get common nodes
