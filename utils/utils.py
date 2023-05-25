@@ -51,6 +51,37 @@ def get_subgraphs(graphs):
 
     return H
 
+def get_common_nodes_edges(G1, G2, group1, group2):
+    # get common nodes
+    nodes1 = set(list(G1.nodes()))
+    nodes2 = set(list(G2.nodes()))
+
+    print("Nodes:")
+    n1_inte_n2 = nodes1 & nodes2
+    print("{} & {}:".format(group1, group2), len(n1_inte_n2))
+
+    n1_diff_n2 = nodes1 - nodes2
+    print("{} - {}:".format(group1, group2), len(n1_diff_n2))
+
+    n2_diff_n1 = nodes2 - nodes1
+    print("{} - {}:".format(group2, group1), len(n2_diff_n1))
+
+    # get common edges
+    edges1 = set(sort_edges(G1.edges()))
+    edges2 = set(sort_edges(G2.edges()))
+
+    print("Edges:")
+    e1_inte_e2 = edges1 & edges2
+    print("{} & {}:".format(group1, group2), len(e1_inte_e2))
+
+    e1_diff_e2 = edges1 - edges2
+    print("{} - {}:".format(group1, group2), len(e1_diff_e2))
+
+    e2_diff_e1 = edges2 - edges1
+    print("{} - {}:".format(group2, group1), len(e2_diff_e1))
+
+    return [[n1_inte_n2, e1_inte_e2], [n1_diff_n2, e1_diff_e2], [n2_diff_n1, e2_diff_e1]]
+
 def get_change_subgraphs(G1, G2, group1, group2):
     # get common nodes
     nodes1 = set(list(G1.nodes()))
