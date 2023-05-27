@@ -29,6 +29,133 @@ colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#00
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
 
+def get_edges_std(G):
+    df_edge_embeddings_join_filter_count = pd.DataFrame(G.edges())
+    df_edge_embeddings_join_filter_count.columns = ["source", "target"]
+    df_edge_embeddings_join_filter_count
+
+    # Get weight
+    df_edge_embeddings_join_filter_count_weight = df_edge_embeddings_join_filter_count.copy()
+    s = []
+    t = []
+    for row in df_edge_embeddings_join_filter_count_weight.itertuples():
+        if row[1] > row[2]:
+            s.append(row[2])
+            t.append(row[1])
+        else:
+            s.append(row[1])
+            t.append(row[2])
+    df_edge_embeddings_join_filter_count_weight["source"] = s
+    df_edge_embeddings_join_filter_count_weight["target"] = t
+
+    # df_edge_embeddings_join_filter_count_weight = df_edge_embeddings_join_filter_count.copy()
+    df_edge_embeddings_join_filter_count_weight.sort_values(["source", "target"], ascending=True, inplace=True)
+    df_edge_embeddings_join_filter_count_weight["idx"] = df_edge_embeddings_join_filter_count_weight["source"].astype(str) + "-" + df_edge_embeddings_join_filter_count_weight["target"].astype(str)
+    list_aux = df_edge_embeddings_join_filter_count_weight.iloc[:, -1].values
+
+    for i in tqdm(subgroups):
+        df_edges = pd.read_csv("{}/output_preprocessing/edges/{}_edges_{}.csv".format(dir, group[0], i))
+        df_edges.sort_values(["source", "target"], ascending=True, inplace=True)
+        df_edges["idx"] = df_edges["source"].astype(str) + "-" + df_edges["target"].astype(str)
+        
+        filter = df_edges["idx"].isin(list_aux)
+        temp = df_edges[filter]
+        list_temp = temp.iloc[:, -2].values
+        df_edge_embeddings_join_filter_count_weight["subgroup{}".format(i)] = list_temp
+    df_edge_embeddings_join_filter_count_weight
+
+    # Dispersion (std)
+    df_edge_embeddings_join_filter_count_weight_std = df_edge_embeddings_join_filter_count_weight.copy()
+    df_edge_embeddings_join_filter_count_weight_std["std"] = np.std(df_edge_embeddings_join_filter_count_weight_std.iloc[:, -len(subgroups):], axis=1)
+    df_edge_embeddings_join_filter_count_weight_std
+
+    # Average weight
+    df_edge_embeddings_join_filter_count_weight_std_avg_all = df_edge_embeddings_join_filter_count_weight_std.copy()
+    df_edge_embeddings_join_filter_count_weight_std_avg_all["weight"] = df_edge_embeddings_join_filter_count_weight_std_avg_all.iloc[:, -(len(subgroups) + 1):-1].mean(axis=1)
+    # df_edge_embeddings_join_filter_count_weight_std_avg_all.to_csv("{}/output_greedy/edges_filter_weight_std_avg_all/greedy_{}_edge-filter-weight-std-avg-all.csv".format(dir, group[0]), index=False)
+    df_edge_embeddings_join_filter_count_weight_std_avg_all
+
+    df_edges_all = df_edge_embeddings_join_filter_count_weight_std_avg_all.iloc[:, [0, 1, -1, -2]]
+    return df_edges_all
+
+def get_nodes_anova(G, dir):
+    # Load dataset Groups
+    df1 = pd.read_csv("{}/input/Edwin_proyecto2/{}.csv".format(dir, "int1"), delimiter="|")
+    df2 = pd.read_csv("{}/input/Edwin_proyecto2/{}.csv".format(dir, "int2"), delimiter="|")
+    df3 = pd.read_csv("{}/input/Edwin_proyecto2/{}.csv".format(dir, "int3"), delimiter="|")
+    df4 = pd.read_csv("{}/input/Edwin_proyecto2/{}.csv".format(dir, "int4"), delimiter="|")
+    # df5_ = pd.read_csv("{}/inputs/Edwin_proyecto2/{}.csv".format(dir, "int5"), delimiter="|")
+
+    # print(df1.shape)
+    # print(df2.shape)
+    # print(df3.shape)
+    # print(df4.shape)
+    # print(df5_.shape)
+
+    # concat
+    # df_join_raw = pd.concat([df1.iloc[:,1:], df2.iloc[:, 2:], df3.iloc[:, 2:], df4.iloc[:, 2:], df5.iloc[:, 2:]], axis=1)
+    df_join_raw = pd.concat([df1.iloc[:, 1:], df2.iloc[:, 2:], df3.iloc[:, 2:], df4.iloc[:, 2:]], axis=1)
+    df_join_raw.set_index(["ionMz"], inplace=True)
+    print(df_join_raw.shape)
+    df_join_raw
+
+    # get groud
+    if group[0] == "zwf1^":
+        r = "zwf1"
+    elif group[0] == "pck1^":
+        r = "pck1"
+    else:
+        r = group[0]
+
+    df_raw_group = df_join_raw.filter(regex=r, axis=1)
+    df_raw_group
+
+    # logarithm
+    df_raw_log = df_raw_group.copy()
+    for column in df_raw_group.columns:
+        df_raw_log[column] = np.log10(df_raw_group[column], where=df_raw_group[column]>0)
+    # df_raw_log[column] = np.log10(df_raw_group[column], out=np.zeros_like(df_raw_group[column]), where=df_raw_group[column]>0)
+    df_raw_log
+
+    subgroups = [item.split("{} ".format(group[0]))[1].split(".")[0] for item in list(df_raw_log.columns)]
+    subgroups = np.unique(subgroups)
+    subgroups
+
+    # split graph
+    list_raw = []
+
+    for item in subgroups:
+        list_raw.append(df_raw_log.filter(like="{} {}.".format(group[0], item)))
+
+    print(len(list_raw))
+    list_raw[0]
+
+    list_raw_copy = list_raw[:]
+
+    for k, item in enumerate(list_raw_copy):
+        item.columns = [chr(65 + k)]*len(item.columns)
+
+    # Filter by graph and concat 
+    nodes = list(G.nodes())
+    df_raw_filter = list_raw_copy[0].loc[nodes, :]
+
+    for k in range(1, len(subgroups)):
+        df_temp = list_raw_copy[k].loc[nodes, :]
+        # df_raw_filter = df_raw_filter.join(df_temp)
+        df_raw_filter = pd.concat([df_raw_filter, df_temp], axis=1)
+
+    # df_raw_filter.to_csv("{}/output_greedy/matrix/greedy_{}_matrix_copy.csv".format(dir, group[0]), index=True)
+    df_raw_filter
+
+    # ANOVA
+    df_raw_filter_anova = df_raw_filter.copy()
+    p_values = anova(df_raw_filter_anova)
+    df_raw_filter_anova["p-value"] = p_values
+    
+    df_raw_filter_anova = df_raw_filter_anova.iloc[:, [-1]]
+
+    return df_raw_filter_anova
+
 def anova(df_raw_filter):
     columns = np.unique(list(df_raw_filter.columns))
     p_values = []
