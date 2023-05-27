@@ -29,7 +29,7 @@ colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#00
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
 
-def get_edges_std(G):
+def get_edges_std(G, dir, group, subgroups):
     df_edge_embeddings_join_filter_count = pd.DataFrame(G.edges())
     df_edge_embeddings_join_filter_count.columns = ["source", "target"]
     df_edge_embeddings_join_filter_count
@@ -78,7 +78,7 @@ def get_edges_std(G):
     df_edges_all = df_edge_embeddings_join_filter_count_weight_std_avg_all.iloc[:, [0, 1, -1, -2]]
     return df_edges_all
 
-def get_nodes_anova(G, dir):
+def get_nodes_anova(G, dir, group):
     # Load dataset Groups
     df1 = pd.read_csv("{}/input/Edwin_proyecto2/{}.csv".format(dir, "int1"), delimiter="|")
     df2 = pd.read_csv("{}/input/Edwin_proyecto2/{}.csv".format(dir, "int2"), delimiter="|")
@@ -96,7 +96,7 @@ def get_nodes_anova(G, dir):
     # df_join_raw = pd.concat([df1.iloc[:,1:], df2.iloc[:, 2:], df3.iloc[:, 2:], df4.iloc[:, 2:], df5.iloc[:, 2:]], axis=1)
     df_join_raw = pd.concat([df1.iloc[:, 1:], df2.iloc[:, 2:], df3.iloc[:, 2:], df4.iloc[:, 2:]], axis=1)
     df_join_raw.set_index(["ionMz"], inplace=True)
-    print(df_join_raw.shape)
+    # print(df_join_raw.shape)
     df_join_raw
 
     # get groud
@@ -127,7 +127,7 @@ def get_nodes_anova(G, dir):
     for item in subgroups:
         list_raw.append(df_raw_log.filter(like="{} {}.".format(group[0], item)))
 
-    print(len(list_raw))
+    # print(len(list_raw))
     list_raw[0]
 
     list_raw_copy = list_raw[:]
