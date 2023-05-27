@@ -1,8 +1,8 @@
 {
     "method": ["dgi", "vgae"],
-    "method_idx": 1,
+    "method_idx": 0,
     "group": [["WT", 5], ["zwf1^", 3], ["pck1^", 2]],
-    "group_idx": 2,
+    "group_idx": 0,
     "group1_idx": 0,
     "group2_idx": 1,
     "dimensions": [3]

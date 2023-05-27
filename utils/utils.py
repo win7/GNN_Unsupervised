@@ -20,12 +20,35 @@ import plotly.graph_objects as go
 import plotly
 from tqdm import tqdm
 
+import scipy.stats as stats
+
 colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#006600",
           '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', 'black',"gray"]
 # colors = px.colors.sequential.Rainbow
 
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
+
+def anova(df_raw_filter):
+    columns = np.unique(list(df_raw_filter.columns))
+    p_values = []
+
+    for i in range(len(df_raw_filter)):
+        row = df_raw_filter.iloc[i,:]
+        list_global = []
+        for column in columns:
+            list_global.append(row[column].values)
+
+        df_raw_filter_aux = pd.DataFrame(list_global)         
+        df_raw_filter_aux = df_raw_filter_aux.T
+        df_raw_filter_aux.columns = columns
+
+        samples = [df_raw_filter_aux[column] for column in columns]
+        df_melt = pd.melt(df_raw_filter_aux)
+        fvalue, pvalue = stats.f_oneway(*samples)
+
+        p_values.append(pvalue)
+    return p_values
 
 def get_subgraphs(graphs):
     # get common nodes
