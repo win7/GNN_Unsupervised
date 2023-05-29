@@ -99,15 +99,7 @@ def get_nodes_anova(G, dir, group):
     # print(df_join_raw.shape)
     df_join_raw
 
-    # get groud
-    if group[0] == "zwf1^":
-        r = "zwf1"
-    elif group[0] == "pck1^":
-        r = "pck1"
-    else:
-        r = group[0]
-
-    df_raw_group = df_join_raw.filter(regex=r, axis=1)
+    df_raw_group = df_join_raw.filter(like=group[0], axis=1)
     df_raw_group
 
     # logarithm
