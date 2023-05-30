@@ -29,7 +29,9 @@ colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#00
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
 
-def get_edges_std(G, dir, group, subgroups):
+def get_edges_std(G, dir, group, subgroups, ddof):
+    # ddof = 0, poblacional
+    # ddof = 1, muestral
     df_edge_embeddings_join_filter_count = pd.DataFrame(G.edges())
     df_edge_embeddings_join_filter_count.columns = ["source", "target"]
     df_edge_embeddings_join_filter_count
@@ -66,7 +68,7 @@ def get_edges_std(G, dir, group, subgroups):
 
     # Dispersion (std)
     df_edge_embeddings_join_filter_count_weight_std = df_edge_embeddings_join_filter_count_weight.copy()
-    df_edge_embeddings_join_filter_count_weight_std["std"] = np.std(df_edge_embeddings_join_filter_count_weight_std.iloc[:, -len(subgroups):], axis=1)
+    df_edge_embeddings_join_filter_count_weight_std["std"] = np.std(df_edge_embeddings_join_filter_count_weight_std.iloc[:, -len(subgroups):], axis=1, ddof=ddof)
     df_edge_embeddings_join_filter_count_weight_std
 
     # Average weight
