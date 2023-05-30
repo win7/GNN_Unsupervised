@@ -31,7 +31,7 @@ name_reduction = ["PCA", "TSNE", "UMAP"]
 
 def get_edges_std(G, dir, group, subgroups, ddof):
     # ddof = 0, poblacional
-    # ddof = 1, muestral
+    # ddof = 1, muestrals
     df_edge_embeddings_join_filter_count = pd.DataFrame(G.edges())
     df_edge_embeddings_join_filter_count.columns = ["source", "target"]
     df_edge_embeddings_join_filter_count
@@ -165,7 +165,7 @@ def anova(df_raw_filter):
         df_raw_filter_aux.columns = columns
 
         samples = [df_raw_filter_aux[column] for column in columns]
-        df_melt = pd.melt(df_raw_filter_aux)
+        # df_melt = pd.melt(df_raw_filter_aux)
         fvalue, pvalue = stats.f_oneway(*samples)
 
         p_values.append(pvalue)
