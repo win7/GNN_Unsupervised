@@ -29,6 +29,54 @@ colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#00
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
 
+def correlation_global(list_groups_subgroups_t, method="pearson"):
+    list_groups_subgroups_t_corr = []
+    for list_groups in tqdm(list_groups_subgroups_t):
+        list_aux = []
+        for subgroup in tqdm(list_groups):
+            matrix = subgroup.corr(method=method) # pearson, kendall, spearman
+            list_aux.append(matrix)
+        list_groups_subgroups_t_corr.append(list_aux)
+    return list_groups_subgroups_t_corr
+
+def split_groups_subgroups(df_join_raw_log, groups, list_groups_id):
+	list_groups_subgroups = []
+	for i, group in enumerate(groups):
+		df_aux = df_join_raw_log.filter(like=group)
+		list_aux = []
+		
+		for subgroup_id in list_groups_id[i]:
+			list_aux.append(df_aux.filter(like="{}{}.".format(group, subgroup_id)))
+		list_groups_subgroups.append(list_aux)
+	return list_groups_subgroups
+
+def get_subgroups_id(df_join_raw_log, groups):
+    list_groups_id = []
+    for group in groups:
+        # get group
+        columns = list(df_join_raw_log.filter(like=group).columns)
+
+        subgroups = [item.split("{}".format(group))[1].split(".")[0] for item in columns]
+        subgroups = np.unique(subgroups)
+        list_groups_id.append(subgroups)
+    return list_groups_id
+
+def transpose_global(list_groups_subgroups):
+    list_groups_subgroups_t = []
+    for list_subgroups in list_groups_subgroups:
+        list_aux = []
+        for subgroup in list_subgroups:
+            aux_t = transpose(subgroup)
+            list_aux.append(aux_t)
+        list_groups_subgroups_t.append(list_aux)
+    return list_groups_subgroups_t
+
+def log10_global(df_join_raw):
+    df_join_raw_log = df_join_raw.copy()
+    for column in df_join_raw.columns:
+        df_join_raw_log[column] = np.log10(df_join_raw[column], where=df_join_raw[column]>0)
+    return df_join_raw_log
+
 def get_edges_std(G, dir, group, subgroups, ddof):
     # ddof = 0, poblacional
     # ddof = 1, muestrals
@@ -150,7 +198,22 @@ def get_nodes_anova(G, dir, group):
 
     return df_raw_filter_anova
 
-def anova(df_raw_filter):
+def anova_(df_raw_filter):
+    columns = np.unique(list(df_raw_filter.columns))
+    p_values = []
+
+    for i in range(len(df_raw_filter)):
+        row = df_raw_filter.iloc[i,:]
+        list_global = []
+        for column in columns:
+            list_global.append(row[column].values)
+
+        fvalue, pvalue = stats.f_oneway(*list_global)
+
+        p_values.append(pvalue)
+    return p_values
+
+def anova_(df_raw_filter):
     columns = np.unique(list(df_raw_filter.columns))
     p_values = []
 
