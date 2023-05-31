@@ -198,7 +198,7 @@ def get_nodes_anova(G, dir, group):
 
     return df_raw_filter_anova
 
-def anova_(df_raw_filter):
+def anova(df_raw_filter):
     columns = np.unique(list(df_raw_filter.columns))
     p_values = []
 
