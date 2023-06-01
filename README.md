@@ -1,6 +1,6 @@
 # GNN Unsupervised
 
-### Input format
+### Input format dataset
 A file in .csv with follow struture:
 
 | Id  | X1.1 | ... | X1.n | X2.1 | ... | X2.m | X3.1 | ... | X3.p | Y1.1 | ... | Y1.q | Y2.1 | ... | Y2.r | Y3.1 | ... | Y3.s |
@@ -16,5 +16,6 @@ A file in .csv with follow struture:
 
 Files
 
-1. preprocessing_raw
-2. 
+1. preprocessing: format input dataset and create graph data (nodes + edges)
+2. node-embeddings: DGI or VGAE
+3. 

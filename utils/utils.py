@@ -18,6 +18,8 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import plotly
+import random
+import torch
 from tqdm import tqdm
 
 import scipy.stats as stats
@@ -28,6 +30,43 @@ colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#00
 
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
+
+def create_graph_data(groups_id, subgroups_id):
+    for i, group in tqdm(enumerate(groups_id)):
+        for subgroup in tqdm(subgroups_id[i]):
+            df_weighted_edges = pd.read_csv("output/preprocessing/edges/edges_{}_{}.csv".format(group, subgroup))
+            G = nx.from_pandas_edgelist(df_weighted_edges, "source", "target", edge_attr="weight")
+            mapping = dict(zip(list(G.nodes()), range(G.number_of_nodes())))
+            G = nx.relabel_nodes(G, mapping)
+            degree = dict(G.degree())
+
+            # graph_detail(G)
+
+            df_nodes = pd.DataFrame(degree.items(), columns=["idx", "degree"])
+            df_nodes["id"] = list(mapping.keys())
+            df_nodes.to_csv("output/preprocessing/graphs_data/nodes_data_{}_{}.csv".format(group, subgroup), index=False)
+
+            edges = list(G.edges())
+            df_edges = pd.DataFrame(edges, columns=["source", "target"])
+            df_edges["weight"] = [G.get_edge_data(edge[0], edge[1])["weight"] for edge in edges]
+            df_edges.to_csv("output/preprocessing/graphs_data/edges_data_{}_{}.csv".format(group, subgroup), index=False)
+
+def build_graph_weight_global(list_groups_subgroups_t_corr, groups_id, subgroups_id, threshold=0.5):
+    list_groups_subgroups_t_corr_g = []
+
+    for i in tqdm(range(len(list_groups_subgroups_t_corr))):
+        list_aux = []
+        for j in tqdm(range(len(list_groups_subgroups_t_corr[i]))):
+            weighted_edges = build_graph_weight(list_groups_subgroups_t_corr[i][j], threshold)
+            df_weighted_edges = pd.DataFrame(weighted_edges, columns=["source", "target", "weight"])
+
+            df_weighted_edges.to_csv("output/preprocessing/edges/edges_{}_{}.csv".format(groups_id[i], subgroups_id[i][j]), index=False)
+            G = nx.from_pandas_edgelist(df_weighted_edges, "source", "target", edge_attr=["weight"])
+            nx.write_gexf(G, "output/preprocessing/graphs/graphs_{}_{}.gexf".format(groups_id[i], subgroups_id[i][j]))
+
+            list_aux.append(df_weighted_edges)
+        list_groups_subgroups_t_corr_g.append(list_aux)
+    return list_groups_subgroups_t_corr_g
 
 def correlation_global(list_groups_subgroups_t, method="pearson"):
 	list_groups_subgroups_t_corr = []
@@ -50,11 +89,11 @@ def split_groups_subgroups(df_join_raw_log, groups, list_groups_id):
 		list_groups_subgroups.append(list_aux)
 	return list_groups_subgroups
 
-def get_subgroups_id(df_join_raw_log, groups):
+def get_subgroups_id(df_join_raw, groups):
 	list_groups_id = []
 	for group in groups:
 		# get group
-		columns = list(df_join_raw_log.filter(like=group).columns)
+		columns = list(df_join_raw.filter(like=group).columns)
 
 		subgroups = [item.split("{}".format(group))[1].split(".")[0] for item in columns]
 		subgroups = np.unique(subgroups)
