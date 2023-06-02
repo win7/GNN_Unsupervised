@@ -17,5 +17,10 @@ A file in .csv with follow struture:
 Files
 
 1. preprocessing: format input dataset and create graph data (nodes + edges)
-2. node-embeddings: DGI or VGAE
-3. 
+2. node-embeddings: generate node-embeddings with DGI or VGAE
+3. processing: generate edge-embeddings and outlier detection
+
+
+
+## To-Do
+- Dynamic edge embeddings operator

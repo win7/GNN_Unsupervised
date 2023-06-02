@@ -31,9 +31,20 @@ colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#00
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
 
+def edge_embeddings_global(method, dimension, groups_id, subgroups_id):
+    for group in tqdm(groups_id):
+        for subgroup in tqdm(subgroups_id[group]):
+            # read dataset
+            df_node_embeddings = pd.read_csv("output/node_embeddings/node-embeddings_{}_{}_{}_{}.csv".format(group, subgroup, method, dimension), index_col=0)
+            df_edges = pd.read_csv("output/preprocessing/graphs_data/edges_data_{}_{}.csv".format(group, subgroup))
+            
+            # get edges embeddings
+            df_edge_embeddings = edge2vec_l2(df_edges, df_node_embeddings)
+            df_edge_embeddings.to_csv("output/edge_embeddings/edge-embeddings_{}_{}_{}_{}_{}.csv".format(group, subgroup, method, dimension, "L2"), index=True)
+
 def create_graph_data(groups_id, subgroups_id):
-    for i, group in tqdm(enumerate(groups_id)):
-        for subgroup in tqdm(subgroups_id[i]):
+    for group in tqdm(groups_id):
+        for subgroup in tqdm(subgroups_id[group]):
             df_weighted_edges = pd.read_csv("output/preprocessing/edges/edges_{}_{}.csv".format(group, subgroup))
             G = nx.from_pandas_edgelist(df_weighted_edges, "source", "target", edge_attr="weight")
             mapping = dict(zip(list(G.nodes()), range(G.number_of_nodes())))
@@ -60,9 +71,9 @@ def build_graph_weight_global(list_groups_subgroups_t_corr, groups_id, subgroups
             weighted_edges = build_graph_weight(list_groups_subgroups_t_corr[i][j], threshold)
             df_weighted_edges = pd.DataFrame(weighted_edges, columns=["source", "target", "weight"])
 
-            df_weighted_edges.to_csv("output/preprocessing/edges/edges_{}_{}.csv".format(groups_id[i], subgroups_id[i][j]), index=False)
+            df_weighted_edges.to_csv("output/preprocessing/edges/edges_{}_{}.csv".format(groups_id[i], subgroups_id[groups_id[i]][j]), index=False)
             G = nx.from_pandas_edgelist(df_weighted_edges, "source", "target", edge_attr=["weight"])
-            nx.write_gexf(G, "output/preprocessing/graphs/graphs_{}_{}.gexf".format(groups_id[i], subgroups_id[i][j]))
+            nx.write_gexf(G, "output/preprocessing/graphs/graphs_{}_{}.gexf".format(groups_id[i], subgroups_id[groups_id[i]][j]))
 
             list_aux.append(df_weighted_edges)
         list_groups_subgroups_t_corr_g.append(list_aux)
@@ -78,27 +89,27 @@ def correlation_global(list_groups_subgroups_t, method="pearson"):
 		list_groups_subgroups_t_corr.append(list_aux)
 	return list_groups_subgroups_t_corr
 
-def split_groups_subgroups(df_join_raw_log, groups, list_groups_id):
-	list_groups_subgroups = []
-	for i, group in enumerate(groups):
+def split_groups_subgroups(df_join_raw_log, groups_id, subgroups_id):
+	list_df_groups_subgroups = []
+	for group in groups_id:
 		df_aux = df_join_raw_log.filter(like=group)
 		list_aux = []
 		
-		for subgroup_id in list_groups_id[i]:
-			list_aux.append(df_aux.filter(like="{}{}.".format(group, subgroup_id)))
-		list_groups_subgroups.append(list_aux)
-	return list_groups_subgroups
+		for subgroup in subgroups_id[group]:
+			list_aux.append(df_aux.filter(like="{}{}.".format(group, subgroup)))
+		list_df_groups_subgroups.append(list_aux)
+	return list_df_groups_subgroups
 
 def get_subgroups_id(df_join_raw, groups):
-	list_groups_id = []
+	dict_groups_id = {}
 	for group in groups:
 		# get group
 		columns = list(df_join_raw.filter(like=group).columns)
 
 		subgroups = [item.split("{}".format(group))[1].split(".")[0] for item in columns]
 		subgroups = np.unique(subgroups)
-		list_groups_id.append(subgroups)
-	return list_groups_id
+		dict_groups_id[group] = subgroups
+	return dict_groups_id
 
 def transpose_global(list_groups_subgroups):
 	list_groups_subgroups_t = []
@@ -405,7 +416,26 @@ def edge2vecx(list_df_node_embeddings, list_df_edges, list_node_embeddings_legen
 			list_edge_embeddings_legend += legends
 	return list_df_edge_embeddings, list_edge_embeddings_legend
 
-def e2v_l2x(df_edges, df_node_embeddings):
+def edge2vec_l2(df_edges, df_node_embeddings):
+	edge2vec = {}
+	index = []
+	data = []
+	for k in range(len(df_edges)):
+		i = df_edges.iloc[k, 0]
+		j = df_edges.iloc[k, 1]
+
+		u = df_node_embeddings.loc[i].values
+		v = df_node_embeddings.loc[j].values
+		r = (u - v) ** 2
+		
+		data.append(r)
+		index.append((i, j))
+
+	index = pd.MultiIndex.from_tuples(index)
+	df_edge_embeddings = pd.DataFrame(data, index=index)
+	return df_edge_embeddings
+
+def edge2vec_l2_v1(df_edges, df_node_embeddings):
 	edge2vec = {}
 	for k in range(len(df_edges)):
 		i = df_edges.iloc[k, 0]
