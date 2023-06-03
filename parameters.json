@@ -1,4 +1,5 @@
 {
+    "exp_name": "test"
     "method": ["dgi", "vgae"],
     "method_idx": 0,
     "group": [["WT", 5], ["zwf1^", 3], ["pck1^", 2]],
