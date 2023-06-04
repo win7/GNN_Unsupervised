@@ -1,12 +1,26 @@
 {
-    "exp_name": "test"
-    "method": ["dgi", "vgae"],
-    "method_idx": 0,
-    "group": [["WT", 5], ["zwf1^", 3], ["pck1^", 2]],
-    "groups_id": ["WT", "zwf1^", "pck1^"],
-    "subgroups_id": {"WT": ["1", "2", "3", "4", "5"], "zwf1^": ["1", "2", "3"], "pck1^": ["1", "2"]},
-    "group_idx": 2,
-    "group1_idx": 0,
-    "group2_idx": 1,
-    "dimensions": [3]
+    "exp": "test1",
+    "groups_id": [
+        "WT",
+        "zwf1^",
+        "pck1^"
+    ],
+    "subgroups_id": {
+        "WT": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+        ],
+        "zwf1^": [
+            "1",
+            "2",
+            "3"
+        ],
+        "pck1^": [
+            "1",
+            "2"
+        ]
+    }
 }

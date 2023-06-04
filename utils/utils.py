@@ -108,7 +108,7 @@ def get_subgroups_id(df_join_raw, groups):
 
 		subgroups = [item.split("{}".format(group))[1].split(".")[0] for item in columns]
 		subgroups = np.unique(subgroups)
-		dict_groups_id[group] = subgroups
+		dict_groups_id[group] = subgroups.tolist()
 	return dict_groups_id
 
 def transpose_global(list_groups_subgroups):
