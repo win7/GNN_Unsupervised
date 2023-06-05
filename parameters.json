@@ -1,7 +1,6 @@
 {
-    "exp": "exp1",
-    "method": ["dgi", "vgae"],
-    "method_idx": 1,
+    "exp": "exp2",
+    "method": "dgi",
     "dimension": 3,
     "groups_id": [
         "WT",
