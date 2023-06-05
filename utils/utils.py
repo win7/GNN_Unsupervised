@@ -31,21 +31,21 @@ colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#00
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
 
-def edge_embeddings_global(method, dimension, groups_id, subgroups_id):
+def edge_embeddings_global(exp, method, dimension, groups_id, subgroups_id):
     for group in tqdm(groups_id):
         for subgroup in tqdm(subgroups_id[group]):
             # read dataset
-            df_node_embeddings = pd.read_csv("output/node_embeddings/node-embeddings_{}_{}_{}_{}.csv".format(group, subgroup, method, dimension), index_col=0)
-            df_edges = pd.read_csv("output/preprocessing/graphs_data/edges_data_{}_{}.csv".format(group, subgroup))
+            df_node_embeddings = pd.read_csv("output/{}/node_embeddings/node-embeddings_{}_{}_{}_{}.csv".format(exp, group, subgroup, method, dimension), index_col=0)
+            df_edges = pd.read_csv("output/{}/preprocessing/graphs_data/edges_data_{}_{}.csv".format(exp, group, subgroup))
             
             # get edges embeddings
             df_edge_embeddings = edge2vec_l2(df_edges, df_node_embeddings)
-            df_edge_embeddings.to_csv("output/edge_embeddings/edge-embeddings_{}_{}_{}_{}_{}.csv".format(group, subgroup, method, dimension, "L2"), index=True)
+            df_edge_embeddings.to_csv("output/{}/edge_embeddings/edge-embeddings_{}_{}_{}_{}_{}.csv".format(exp, group, subgroup, method, dimension, "L2"), index=True)
 
-def create_graph_data(groups_id, subgroups_id):
+def create_graph_data(exp, groups_id, subgroups_id):
     for group in tqdm(groups_id):
         for subgroup in tqdm(subgroups_id[group]):
-            df_weighted_edges = pd.read_csv("output/preprocessing/edges/edges_{}_{}.csv".format(group, subgroup))
+            df_weighted_edges = pd.read_csv("output/{}/preprocessing/edges/edges_{}_{}.csv".format(exp, group, subgroup))
             G = nx.from_pandas_edgelist(df_weighted_edges, "source", "target", edge_attr="weight")
             mapping = dict(zip(list(G.nodes()), range(G.number_of_nodes())))
             G = nx.relabel_nodes(G, mapping)
@@ -55,14 +55,14 @@ def create_graph_data(groups_id, subgroups_id):
 
             df_nodes = pd.DataFrame(degree.items(), columns=["idx", "degree"])
             df_nodes["id"] = list(mapping.keys())
-            df_nodes.to_csv("output/preprocessing/graphs_data/nodes_data_{}_{}.csv".format(group, subgroup), index=False)
+            df_nodes.to_csv("output/{}/preprocessing/graphs_data/nodes_data_{}_{}.csv".format(exp, group, subgroup), index=False)
 
             edges = list(G.edges())
             df_edges = pd.DataFrame(edges, columns=["source", "target"])
             df_edges["weight"] = [G.get_edge_data(edge[0], edge[1])["weight"] for edge in edges]
-            df_edges.to_csv("output/preprocessing/graphs_data/edges_data_{}_{}.csv".format(group, subgroup), index=False)
+            df_edges.to_csv("output/{}/preprocessing/graphs_data/edges_data_{}_{}.csv".format(exp, group, subgroup), index=False)
 
-def build_graph_weight_global(list_groups_subgroups_t_corr, groups_id, subgroups_id, threshold=0.5):
+def build_graph_weight_global(exp, list_groups_subgroups_t_corr, groups_id, subgroups_id, threshold=0.5):
     list_groups_subgroups_t_corr_g = []
 
     for i in tqdm(range(len(list_groups_subgroups_t_corr))):
@@ -71,9 +71,9 @@ def build_graph_weight_global(list_groups_subgroups_t_corr, groups_id, subgroups
             weighted_edges = build_graph_weight(list_groups_subgroups_t_corr[i][j], threshold)
             df_weighted_edges = pd.DataFrame(weighted_edges, columns=["source", "target", "weight"])
 
-            df_weighted_edges.to_csv("output/preprocessing/edges/edges_{}_{}.csv".format(groups_id[i], subgroups_id[groups_id[i]][j]), index=False)
+            df_weighted_edges.to_csv("output/{}/preprocessing/edges/edges_{}_{}.csv".format(exp, groups_id[i], subgroups_id[groups_id[i]][j]), index=False)
             G = nx.from_pandas_edgelist(df_weighted_edges, "source", "target", edge_attr=["weight"])
-            nx.write_gexf(G, "output/preprocessing/graphs/graphs_{}_{}.gexf".format(groups_id[i], subgroups_id[groups_id[i]][j]))
+            nx.write_gexf(G, "output/{}/preprocessing/graphs/graphs_{}_{}.gexf".format(exp, groups_id[i], subgroups_id[groups_id[i]][j]))
 
             list_aux.append(df_weighted_edges)
         list_groups_subgroups_t_corr_g.append(list_aux)
