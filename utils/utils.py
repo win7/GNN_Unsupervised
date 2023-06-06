@@ -51,7 +51,7 @@ def std_global(dict_df_edges_filter_weight, exp, method, dimension, groups_id, t
 
         # save
         if save:
-            df_edges_filter_weight_std_avg.to_csv("output/{}/common_edges/common_edges_std_{}_{}_{}_{}.csv".format(exp, group, method, dimension, "L2"), index=False)
+            df_edges_filter_weight_std_avg.to_csv("output/{}/common_edges/common_edges_{}_{}_{}_{}.csv".format(exp, group, method, dimension, "L2"), index=False)
             
             G = nx.from_pandas_edgelist(df_edges_filter_weight_std_avg, "source", "target", edge_attr=["weight"])
             nx.write_gexf(G, "output/{}/common_edges/common_edges_{}_{}_{}_{}.gexf".format(exp, group, method, dimension, "L2"))
@@ -69,7 +69,6 @@ def std_global(dict_df_edges_filter_weight, exp, method, dimension, groups_id, t
             plt.close()
 
         dict_df_common_edges_std[group] = df_edges_filter_weight_std_avg
-
     return dict_df_common_edges_std
 
 def get_weight_global(dict_df_edges_filter, exp, groups_id, subgroups_id):
