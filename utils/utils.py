@@ -64,7 +64,7 @@ def std_global(dict_df_edges_filter_weight, exp, method, dimension, groups_id, t
             l = len(df_edges_filter_weight) - len(df_edges_filter_weight_std)
             t = len(df_edges_filter_weight)
             plt.title("Loss: {} of {} ({}%)".format(l, t, round(l*100/t)))
-            plt.savefig("output/{}/plots/common_edges_{}_{}_{}_{}.png".format(exp, group, method, dimension, "L2"))
+            plt.savefig("output/{}/plots/common_edges_std_{}_{}_{}_{}.png".format(exp, group, method, dimension, "L2"))
             # plt.show()
             plt.close()
 
