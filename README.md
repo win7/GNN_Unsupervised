@@ -24,3 +24,9 @@ Files
 ## To-Do
 - Dynamic edge embeddings operator
 - Parallel edge2vec operator
+
+df_edges.to_csv("output/{}/baseline/common_edges/common_edges_{}_{}.csv".format(exp, group, method), index=False)
+nx.write_gexf(SG, "output/{}/baseline/common_edges/common_edges_{}_{}.gexf".format(exp, group, method))
+
+df_edges = pd.read_csv("output/{}/baseline/common_edges/common_edges_{}_{}.csv".format(exp, group, method))
+df_edges.head()
