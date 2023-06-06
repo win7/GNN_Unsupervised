@@ -21,6 +21,9 @@ Files
 3. node-embeddings: generate node-embeddings with DGI or VGAE
 4. processing: generate edge-embeddings and outlier detection
 
+Aditional Files
+1. baseline: greedy algorithm
+
 ## To-Do
 - Dynamic edge embeddings operator
 - Parallel edge2vec operator
