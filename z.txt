@@ -12,3 +12,60 @@ G = nx.Graph()
 G.add_weighted_edges_from(list)
 
 R = nx.intersection(G1, G2)
+
+
+{
+    "exp": "exp3",
+    "method": "dgi",
+    "dimension": 3,
+    "groups_id": [
+        "WT",
+        "zwf1^",
+        "pck1^"
+    ],
+    "subgroups_id": {
+        "WT": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+        ],
+        "zwf1^": [
+            "1",
+            "2",
+            "3"
+        ],
+        "pck1^": [
+            "1",
+            "2"
+        ]
+    },
+    "option": {
+        "WT": [
+            "dyn"
+        ],
+        "zwf1^": [
+            "dyn"
+        ],
+        "pck1^": [
+            "dyn"
+        ]
+    }
+}
+
+train_vgae(graph, args, method, group, subgroup):
+
+# Format files
+dyn, str
+
+Graph data:
+- Nodes:    nodes_<group>_<subgroup>.csv
+            nodes_<group>_<option>.csv
+
+- Edges:    edges_<group>_<subgroup>.csv
+            edges_<group>_<option>.csv
+
+Embeddings:
+- Nodes:    node-embeddings_<method>_<group>_<subgroup>.csv
+            node-embeddings_<method>_<group>_<option>.csv
