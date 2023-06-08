@@ -1,6 +1,6 @@
 {
     "exp": "exp5",
-    "method": "vgae",
+    "method": "dgi",
     "dimension": 3,
     "groups_id": [
         "WT",
@@ -25,5 +25,6 @@
             "2"
         ]
     },
-    "option": "str"
+    "option": "dyn"
 }
+

@@ -31,7 +31,7 @@ colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#00
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
 
-def std_global(dict_df_edges_filter_weight, exp, method, dimension, groups_id, th=0.3, plot=True, save=False):
+def std_global(dict_df_edges_filter_weight, exp, method, groups_id, th=0.3, plot=True, save=False):
     dict_df_common_edges_std = {}
 
     for group in tqdm(groups_id):
@@ -51,10 +51,10 @@ def std_global(dict_df_edges_filter_weight, exp, method, dimension, groups_id, t
 
         # save
         if save:
-            df_edges_filter_weight_std_avg.to_csv("output/{}/common_edges/common_edges_{}_{}_{}_{}.csv".format(exp, group, method, dimension, "L2"), index=False)
+            df_edges_filter_weight_std_avg.to_csv("output/{}/common_edges/common_edges_{}_{}.csv".format(exp, method, group), index=False)
             
             G = nx.from_pandas_edgelist(df_edges_filter_weight_std_avg, "source", "target", edge_attr=["weight"])
-            nx.write_gexf(G, "output/{}/common_edges/common_edges_{}_{}_{}_{}.gexf".format(exp, group, method, dimension, "L2"))
+            nx.write_gexf(G, "output/{}/common_edges/common_edges_{}_{}.gexf".format(exp, method, group))
 
         # plot
         if plot:
@@ -64,7 +64,7 @@ def std_global(dict_df_edges_filter_weight, exp, method, dimension, groups_id, t
             l = len(df_edges_filter_weight) - len(df_edges_filter_weight_std)
             t = len(df_edges_filter_weight)
             plt.title("Loss: {} of {} ({}%)".format(l, t, round(l*100/t)))
-            plt.savefig("output/{}/plots/common_edges_std_{}_{}_{}_{}.png".format(exp, group, method, dimension, "L2"))
+            plt.savefig("output/{}/plots/common_edges_std_{}_{}.png".format(exp, method, group))
             # plt.show()
             plt.close()
 
@@ -94,7 +94,20 @@ def get_weight_global(dict_df_edges_filter, exp, groups_id, subgroups_id):
         list_aux = df_edges_filter_weight.iloc[:, -1].values
 
         for subgroup in tqdm(subgroups_id[group]):
-            df_edges = pd.read_csv("output/{}/preprocessing/edges/edges_{}_{}.csv".format(exp, group, subgroup))
+            df_edges = pd.read_csv("output/{}/preprocessing/edges/edges_{}_{}.csv".format(exp, group, subgroup),
+                                   dtype={"source": "string", "target": "string"})
+            s = []
+            t = []
+            for row in df_edges.itertuples():
+                if row[1] > row[2]:
+                    s.append(row[2])
+                    t.append(row[1])
+                else:
+                    s.append(row[1])
+                    t.append(row[2])
+            df_edges["source"] = s
+            df_edges["target"] = t
+
             df_edges.sort_values(["source", "target"], ascending=True, inplace=True)
             df_edges["idx"] = df_edges["source"].astype(str) + "-" + df_edges["target"].astype(str)
             
@@ -164,12 +177,12 @@ def edge_embeddings_global(exp, method, dimension, groups_id, subgroups_id):
     for group in tqdm(groups_id):
         for subgroup in tqdm(subgroups_id[group]):
             # read dataset
-            df_node_embeddings = pd.read_csv("output/{}/node_embeddings/node-embeddings_{}_{}_{}_{}.csv".format(exp, group, subgroup, method, dimension), index_col=0)
+            df_node_embeddings = pd.read_csv("output/{}/node_embeddings/node-embeddings_{}_{}_{}.csv".format(exp, method, group, subgroup), index_col=0)
             df_edges = pd.read_csv("output/{}/preprocessing/graphs_data/edges_data_{}_{}.csv".format(exp, group, subgroup))
             
             # get edges embeddings
             df_edge_embeddings = edge2vec_l2(df_edges, df_node_embeddings)
-            df_edge_embeddings.to_csv("output/{}/edge_embeddings/edge-embeddings_{}_{}_{}_{}_{}.csv".format(exp, group, subgroup, method, dimension, "L2"), index=True)
+            df_edge_embeddings.to_csv("output/{}/edge_embeddings/edge-embeddings_{}_{}_{}.csv".format(exp, method, group, subgroup), index=True)
 
 def create_graph_data(exp, groups_id, subgroups_id):
     for group in tqdm(groups_id):
