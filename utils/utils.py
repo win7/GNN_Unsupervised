@@ -173,7 +173,7 @@ def get_subgraphs_global(dict_graphs, groups_id):
         dict_df_edges_filter[group] = df_edges_filter
     return dict_df_edges_filter
 
-def edge_embeddings_global(exp, method, dimension, groups_id, subgroups_id):
+def edge_embeddings_global(exp, method, groups_id, subgroups_id):
     for group in tqdm(groups_id):
         for subgroup in tqdm(subgroups_id[group]):
             # read dataset
