@@ -1,0 +1,14 @@
+Notes:
+
+df = pd.DataFrame(elist, columns=["source", "target", "weight"])
+
+df[["source", "target"]] = df[["source", "target"]].astype("string")
+
+df = pd.read_csv("del.csv", dtype={"source": "string", "target": "string"})
+
+G = nx.from_pandas_edgelist(df_weighted_edges, "source", "target", edge_attr="weight")
+
+G = nx.Graph()
+G.add_weighted_edges_from(list)
+
+R = nx.intersection(G1, G2)
