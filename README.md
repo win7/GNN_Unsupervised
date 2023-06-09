@@ -17,12 +17,13 @@ A file in .csv with follow struture:
 Files
 
 1. format_input: format input dataset according to above table 
-2. preprocessing:and create graph data (nodes + edges)
+2. preprocessing: create graph data (nodes, edges)
 3. node-embeddings: generate node-embeddings with DGI or VGAE
 4. processing: generate edge-embeddings and outlier detection
+5. comparation: compare baseline (Greedy) with GNN (DGI, VGAE)
 
 Aditional Files
-1. baseline: greedy algorithm
+1. baseline: Greedy algorithm
 
 ## To-Do
 - Dynamic edge embeddings operator

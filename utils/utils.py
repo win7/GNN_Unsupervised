@@ -31,7 +31,7 @@ colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#00
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
 
-def std_global(dict_df_edges_filter_weight, exp, method, groups_id, th=0.3, plot=True, save=False):
+def std_global(dict_df_edges_filter_weight, exp, method, groups_id, option, th=0.3, plot=True, save=False):
     dict_df_common_edges_std = {}
 
     for group in tqdm(groups_id):
@@ -51,10 +51,10 @@ def std_global(dict_df_edges_filter_weight, exp, method, groups_id, th=0.3, plot
 
         # save
         if save:
-            df_edges_filter_weight_std_avg.to_csv("output/{}/common_edges/common_edges_{}_{}.csv".format(exp, method, group), index=False)
+            df_edges_filter_weight_std_avg.to_csv("output/{}/common_edges/common_edges_{}_{}_{}.csv".format(exp, method, group, option), index=False)
             
             G = nx.from_pandas_edgelist(df_edges_filter_weight_std_avg, "source", "target", edge_attr=["weight"])
-            nx.write_gexf(G, "output/{}/common_edges/common_edges_{}_{}.gexf".format(exp, method, group))
+            nx.write_gexf(G, "output/{}/common_edges/common_edges_{}_{}_{}.gexf".format(exp, method, group, option))
 
         # plot
         if plot:
@@ -64,7 +64,7 @@ def std_global(dict_df_edges_filter_weight, exp, method, groups_id, th=0.3, plot
             l = len(df_edges_filter_weight) - len(df_edges_filter_weight_std)
             t = len(df_edges_filter_weight)
             plt.title("Loss: {} of {} ({}%)".format(l, t, round(l*100/t)))
-            plt.savefig("output/{}/plots/common_edges_std_{}_{}.png".format(exp, method, group))
+            plt.savefig("output/{}/plots/common_edges_std_{}_{}_{}.png".format(exp, method, group, option))
             # plt.show()
             plt.close()
 
