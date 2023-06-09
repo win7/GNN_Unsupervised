@@ -66,7 +66,7 @@ def std_global(dict_df_edges_filter_weight, exp, method, groups_id, option, th=0
             plt.title("Loss: {} of {} ({}%)".format(l, t, round(l*100/t)))
             plt.savefig("output/{}/plots/common_edges_std_{}_{}_{}.png".format(exp, method, group, option))
             # plt.show()
-            plt.close()
+            plt.clf()
 
         dict_df_common_edges_std[group] = df_edges_filter_weight_std_avg
     return dict_df_common_edges_std
@@ -156,7 +156,7 @@ def std_global_(dict_df_edges_filter_weight, exp, method, dimension, groups_id, 
             plt.title("Loss: {} of {} ({}%)".format(l, t, round(l*100/t)))
             plt.savefig("output/{}/baseline/plots/common_edges_std_{}_{}_{}_{}.png".format(exp, group, method, dimension, "L2"))
             # plt.show()
-            plt.close()
+            plt.clf()
 
         dict_df_common_edges_std[group] = df_edges_filter_weight_std_avg
 
