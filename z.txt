@@ -99,6 +99,9 @@ nx.draw_networkx(U)
 plt.show()
 #---
 
+MG.edges.data()
+
+nx.set_edge_attributes(R, {(u, v): {"label": get_label(ed, th=0.8)} for u, v, ed in R.edges.data()})
 
 !python del.py 2 ggg
 
