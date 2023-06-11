@@ -20,10 +20,11 @@ Files
 2. preprocessing: create graph data (nodes, edges) (ok)
 3. node-embeddings: generate node-embeddings with DGI or VGAE (ok)
 4. processing: generate edge-embeddings and outlier detection (ok)
-5. comparation: compare baseline (Greedy) with GNN (DGI, VGAE)
+5. change_detection
 
 Aditional Files
 1. baseline: Greedy algorithm for get maximun common subgraph (ok)
+2. comparation: compare baseline (Greedy) with GNN (DGI, VGAE) on data variation
 
 ## To-Do
 - Dynamic edge embeddings operator

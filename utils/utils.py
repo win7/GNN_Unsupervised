@@ -31,6 +31,38 @@ colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#00
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
 
+def get_label(weights, th=0.8):
+    w1 = weights.get("weight1")
+    w2 = weights.get("weight2")
+
+    l1 = "?"
+    l2 = "?"
+
+    if w1:
+        if w1 > 0:
+            if w1 >= th:
+                l1 = "P"
+            else:
+                l1 = "p"
+        else:
+            if w1 <= -th:
+                l1 = "N"
+            else:
+                l1 = "n"
+    if w2:
+        if w2 > 0:
+            if w2 >= th:
+                l2 = "P"
+            else:
+                l2 = "p"
+        else:
+            if w2 <= -th:
+                l2 = "N"
+            else:
+                l2 = "n"
+    label = l1 + l2
+    return label
+
 def std_global(dict_df_edges_filter_weight, exp, method, groups_id, option, th=0.3, plot=True, save=False):
     dict_df_common_edges_std = {}
 
