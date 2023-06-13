@@ -24,7 +24,7 @@ Files
 5. baseline: Greedy algorithm for get maximun common subgraph (ok)
 6. comparation: compare baseline (Greedy) with GNN (DGI, VGAE) on data variation
 7. change_detection
-8. 
+8. Processing_biocyc
 
 Aditional Files
 1. synthetic_graphs:
