@@ -19,6 +19,9 @@ nx.write_gexf(SG, "output/{}/baseline/common_edges/common_edges_{}_{}.gexf".form
 df_edges = pd.read_csv("output/{}/baseline/common_edges/common_edges_{}_{}.csv".format(exp, group, method))
 df_edges.head()
 
+df_weighted_edges = pd.read_csv("output/{}/preprocessing/edges/edges_{}_{}.csv".format(exp, group, subgroup), dtype={"source": "string", "target": "string"})
+    G = nx.from_pandas_edgelist(df_weighted_edges, "source", "target", edge_attr="weight")
+
 #---
 # elist = [(2, 1), (3, 2), (4, 1), (2, 4)]
 
@@ -105,6 +108,7 @@ nx.set_edge_attributes(R, {(u, v): {"label": get_label(ed, th=0.8)} for u, v, ed
 
 !python del.py 2 ggg
 
+df = nx.to_pandas_edgelist(G)
 
 {
     "exp": "exp3",

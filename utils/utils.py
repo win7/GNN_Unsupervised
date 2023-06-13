@@ -31,6 +31,55 @@ colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#00
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
 
+def sort_df_edges(df_edges):
+    s = []
+    t = []
+    for row in df_edges.itertuples():
+        if row[1] > row[2]:
+            s.append(row[2])
+            t.append(row[1])
+        else:
+            s.append(row[1])
+            t.append(row[2])
+    df_edges["source"] = s
+    df_edges["target"] = t
+    
+def create_graph_data_other(exp, groups_id, subgroups_id, option):
+    for group in tqdm(groups_id):
+        list_graphs = []
+        for subgroup in tqdm(subgroups_id[group]):
+            df_weighted_edges = pd.read_csv("output/{}/preprocessing/edges/edges_{}_{}.csv".format(exp, group, subgroup), dtype={"source": "string", "target": "string"})
+            G = nx.from_pandas_edgelist(df_weighted_edges, "source", "target", edge_attr="weight")
+            list_graphs.append(G)
+
+        rename = [chr(k + 65) for k in range(len(list_graphs))]
+        list_edges = []
+
+        for k in range(len(list_graphs) - 1):
+            nodes = list(list_graphs[k].nodes())
+            for node in nodes:
+                if list_graphs[k + 1].has_node(node):
+                    list_edges.append((rename[k] + str(node), rename[k + 1] + str(node), 0))
+                    if option == "str":
+                        break
+
+        U = nx.union_all(list_graphs, rename=rename)
+        # append edges
+        U.add_weighted_edges_from(list_edges)
+
+        mapping = dict(zip(list(U.nodes()), range(U.number_of_nodes())))
+        U = nx.relabel_nodes(U, mapping)
+        degree = dict(U.degree())
+
+        df_nodes = pd.DataFrame(degree.items(), columns=["idx", "degree"])
+        df_nodes["id"] = list(mapping.keys())
+        df_nodes.to_csv("output/{}/preprocessing/graphs_data/nodes_data_{}_{}.csv".format(exp, group, option), index=False)
+
+        edges = list(U.edges())
+        df_edges = pd.DataFrame(edges, columns=["source", "target"])
+        df_edges["weight"] = [U.get_edge_data(edge[0], edge[1])["weight"] for edge in edges]
+        df_edges.to_csv("output/{}/preprocessing/graphs_data/edges_data_{}_{}.csv".format(exp, group, option), index=False)
+
 def get_label(weights, th=0.8):
     w1 = weights.get("weight1")
     w2 = weights.get("weight2")
@@ -1092,17 +1141,18 @@ def get_random_walk(graph, node, n_steps=4):
     return local_path
 
 def info_graph(graph):
-    """ print(f"Radius: {nx.radius(graph)}")
-    print(f"Diameter: {nx.diameter(graph)}")
-    print(f"Eccentricity: {nx.eccentricity(graph)}")
-    print(f"Center: {nx.center(graph)}")
-    print(f"Periphery: {nx.periphery(graph)}") """
-    print(f"Density: {nx.density(graph)}")
-    print(f"Length: {len(graph)}")
-    print(f"Nodes: {sorted(graph.nodes())}")
-    print(f"N° nodes: {graph.number_of_nodes()}")
-    print(f"Edges: {graph.edges()}")
-    print(f"N° edges: {graph.number_of_edges()}")
+    print(f"N° nodes:\t{graph.number_of_nodes()}")
+    print(f"N° edges:\t{graph.number_of_edges()}")
+    print(f"Radius:\t\t{nx.radius(graph)}")
+    print(f"Diameter:\t{nx.diameter(graph)}")
+    print(f"Density:\t{nx.density(graph)}")
+    # print(f"Eccentricity: {nx.eccentricity(graph)}")
+    # print(f"Center: {nx.center(graph)}")
+    # print(f"Periphery: {nx.periphery(graph)}")
+    # print(f"Length: {len(graph)}")
+    # print(f"Nodes: {sorted(graph.nodes())}")
+    # print(f"Edges: {graph.edges()}")
+    
 
 def join_sub(df, blocks):
     # blocks= [(start1, end1), (start2, end2), ...]

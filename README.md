@@ -16,17 +16,23 @@ A file in .csv with follow struture:
 
 Files
 
+
 1. format_input: format input dataset according to above table (ok)
 2. preprocessing: create graph data (nodes, edges) (ok)
 3. node-embeddings: generate node-embeddings with DGI or VGAE (ok)
 4. processing: generate edge-embeddings and outlier detection (ok)
-5. change_detection
+5. baseline: Greedy algorithm for get maximun common subgraph (ok)
+6. comparation: compare baseline (Greedy) with GNN (DGI, VGAE) on data variation
+7. change_detection
 
 Aditional Files
-1. baseline: Greedy algorithm for get maximun common subgraph (ok)
-2. comparation: compare baseline (Greedy) with GNN (DGI, VGAE) on data variation
-
+1. synthetic_graphs:
+3. 
 ## To-Do
 - Dynamic edge embeddings operator
 - Parallel edge2vec operator
 - improve mapping idx with id
+
+## Notes
+- exp4 syntetic (0.5)
+- exp5 syntetic (0.3)
