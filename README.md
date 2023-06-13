@@ -24,6 +24,7 @@ Files
 5. baseline: Greedy algorithm for get maximun common subgraph (ok)
 6. comparation: compare baseline (Greedy) with GNN (DGI, VGAE) on data variation
 7. change_detection
+8. 
 
 Aditional Files
 1. synthetic_graphs:
@@ -34,5 +35,8 @@ Aditional Files
 - improve mapping idx with id
 
 ## Notes
-- exp4 syntetic (0.5)
-- exp5 syntetic (0.3)
+- exp1 MS GNN Greedy (experimet 1) (this for manuscript)
+- exp2 MS GNN Greedy (experimet 2)
+- exp3 Syntectic GNN Greedy (test)
+- exp4 Syntectic GNN Greedy (n=1000, p=0.5)
+- exp5 Syntectic GNN Greedy (n=1000, p=0.3) (this for manuscript)

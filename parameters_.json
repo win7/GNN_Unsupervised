@@ -27,3 +27,28 @@
     },
     "option": ""
 }
+
+{
+    "exp": "exp5",
+    "method": "vgae",
+    "dimension": 3,
+    "groups_id": [
+        "s_WT",
+        "s_zwf1^"
+    ],
+    "subgroups_id": {
+        "s_WT": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+        ],
+        "s_zwf1^": [
+            "1",
+            "2",
+            "3"
+        ]
+    },
+    "option": ""
+}

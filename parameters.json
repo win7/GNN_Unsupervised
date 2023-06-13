@@ -1,24 +1,29 @@
 {
-    "exp": "exp5",
+    "exp": "exp1",
     "method": "vgae",
     "dimension": 3,
     "groups_id": [
-        "s_WT",
-        "s_zwf1^"
+        "WT",
+        "zwf1^",
+        "pck1^"
     ],
     "subgroups_id": {
-        "s_WT": [
+        "WT": [
             "1",
             "2",
             "3",
             "4",
             "5"
         ],
-        "s_zwf1^": [
+        "zwf1^": [
             "1",
             "2",
             "3"
+        ],
+        "pck1^": [
+            "1",
+            "2"
         ]
     },
-    "option": ""
+    "option": "dyn"
 }
