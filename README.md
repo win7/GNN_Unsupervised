@@ -24,7 +24,7 @@ Files
 5. baseline: Greedy algorithm for get maximun common subgraph (ok)
 6. comparation: compare baseline (Greedy) with GNN (DGI, VGAE) on data variation
 7. change_detection
-8. Processing_biocyc
+8. processing_biocyc
 
 Aditional Files
 1. synthetic_graphs:
@@ -32,7 +32,7 @@ Aditional Files
 ## To-Do
 - Dynamic edge embeddings operator
 - Parallel edge2vec operator
-- improve mapping idx with id
+- Improve mapping idx with id
 
 ## Notes
 - exp1 MS GNN Greedy (experimet 1) (this for manuscript)
