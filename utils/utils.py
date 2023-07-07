@@ -640,7 +640,24 @@ def edge2vecx(list_df_node_embeddings, list_df_edges, list_node_embeddings_legen
     return list_df_edge_embeddings, list_edge_embeddings_legend
 
 def edge2vec_l2(df_edges, df_node_embeddings):
-    edge2vec = {}
+    index = []
+    data = []
+    for row in df_edges.itertuples():
+        i = row[1]
+        j = row[2]
+
+        u = df_node_embeddings.loc[i].values
+        v = df_node_embeddings.loc[j].values
+        r = (u - v) ** 2
+        
+        index.append((i, j))
+        data.append(r)
+
+    index = pd.MultiIndex.from_tuples(index)
+    df_edge_embeddings = pd.DataFrame(data, index=index)
+    return df_edge_embeddings
+
+def edge2vec_l2_v2(df_edges, df_node_embeddings):
     index = []
     data = []
     for k in range(len(df_edges)):
