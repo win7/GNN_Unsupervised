@@ -8,6 +8,7 @@ from sklearn.preprocessing import Normalizer
 from sklearn.manifold import TSNE, MDS, Isomap, LocallyLinearEmbedding, SpectralEmbedding
 from hdbscan import HDBSCAN
 from umap import UMAP
+from tqdm import tqdm
 
 import math
 import matplotlib.pyplot as plt
@@ -20,7 +21,7 @@ import plotly.graph_objects as go
 import plotly
 import random
 import torch
-from tqdm import tqdm
+import pymp
 
 import scipy.stats as stats
 
@@ -291,8 +292,10 @@ def build_graph_weight_global(exp, list_groups_subgroups_t_corr, groups_id, subg
     for i in tqdm(range(len(list_groups_subgroups_t_corr))):
         list_aux = []
         for j in tqdm(range(len(list_groups_subgroups_t_corr[i]))):
-            weighted_edges = build_graph_weight(list_groups_subgroups_t_corr[i][j], threshold)
+            weighted_edges = p_build_graph_weight(list_groups_subgroups_t_corr[i][j], threshold)
             df_weighted_edges = pd.DataFrame(weighted_edges, columns=["source", "target", "weight"])
+            df_weighted_edges = df_weighted_edges[df_weighted_edges["weight"] != 0]
+            df_weighted_edges.reset_index(inplace=True)
 
             df_weighted_edges.to_csv("output/{}/preprocessing/edges/edges_{}_{}.csv".format(exp, groups_id[i], subgroups_id[groups_id[i]][j]), index=False)
             G = nx.from_pandas_edgelist(df_weighted_edges, "source", "target", edge_attr=["weight"])
@@ -638,6 +641,27 @@ def edge2vecx(list_df_node_embeddings, list_df_edges, list_node_embeddings_legen
             list_df_edge_embeddings += [df_edge_embeddings]
             list_edge_embeddings_legend += legends
     return list_df_edge_embeddings, list_edge_embeddings_legend
+
+def p_edge2vec_l2(df_edges, df_node_embeddings):
+    index = pymp.shared.array((len(df_edges), 2), dtype="int")
+    data = pymp.shared.array((len(df_edges), dimension), dtype="float")
+
+    with pymp.Parallel(24) as p:
+        for k in p.range(len(df_edges)):
+            i = df_edges.iloc[k, 0]
+            j = df_edges.iloc[k, 1]
+
+            u = df_node_embeddings.loc[i].values
+            v = df_node_embeddings.loc[j].values
+            r = (u - v) ** 2
+            
+            data[k] = r
+            index[k] = (i, j)
+
+    index =list(map(tuple, index))
+    index = pd.MultiIndex.from_tuples(index)
+    df_edge_embeddings = pd.DataFrame(data, index=index)
+    return df_edge_embeddings
 
 def edge2vec_l2(df_edges, df_node_embeddings):
     index = []
@@ -1170,7 +1194,6 @@ def info_graph(graph):
     # print(f"Nodes: {sorted(graph.nodes())}")
     # print(f"Edges: {graph.edges()}")
     
-
 def join_sub(df, blocks):
     # blocks= [(start1, end1), (start2, end2), ...]
     sdf = df.iloc[:, blocks[0][0]:blocks[0][1]]
@@ -1206,6 +1229,21 @@ def build_graph_weight(matrix, threshold=0.5):
         for j in matrix.columns[k + 1:]:
             if not math.isnan(matrix[i][j]) and abs(matrix[i][j]) >= threshold:
                 edges.append([i, j, matrix[i][j]])
+    return edges
+
+def p_build_graph_weight(matrix, threshold=0.5):
+    c = len(matrix)
+    edges = pymp.shared.array((c**2, 3), dtype="float")
+    index = list(matrix.index)
+    columns = list(matrix.columns)
+
+    with pymp.Parallel(24) as p:
+        for i in p.range(len(index)):
+            for j in range(i + 1, c):
+                i_ = index[i]
+                j_ = index[j]
+                if not math.isnan(matrix[i_][j_]) and abs(matrix[i_][j_]) >= threshold:
+                    edges[i * c + j] = [i_, j_, matrix[i_][j_]]
     return edges
 
 def deepwalk(G, num_walk, num_step):

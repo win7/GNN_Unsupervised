@@ -40,3 +40,4 @@ Aditional Files
 - exp3 Syntectic GNN Greedy (test)
 - exp4 Syntectic GNN Greedy (n=1000, p=0.5)
 - exp5 Syntectic GNN Greedy (n=1000, p=0.3) (this for manuscript)
+- exp7 improve runtimes
