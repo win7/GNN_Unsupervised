@@ -646,6 +646,7 @@ def edge2vecx(list_df_node_embeddings, list_df_edges, list_node_embeddings_legen
     return list_df_edge_embeddings, list_edge_embeddings_legend
 
 def p_edge2vec_l2(df_edges, df_node_embeddings):
+    dimension = df_node_embeddings.shape[1]
     index = pymp.shared.array((len(df_edges), 2), dtype="int")
     data = pymp.shared.array((len(df_edges), dimension), dtype="float")
 

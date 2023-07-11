@@ -1,6 +1,6 @@
 {
     "raw_folder": "Edwin_proyecto2",
-    "exp": "exp7",
+    "exp": "exp1",
     "method": "vgae",
     "dimension": 3,
     "groups_id": [
