@@ -28,7 +28,10 @@ Files
 
 Aditional Files
 1. synthetic_graphs:
-3. 
+2.
+
+Improve
+1. 
 ## To-Do
 - Dynamic edge embeddings operator
 - Parallel edge2vec operator

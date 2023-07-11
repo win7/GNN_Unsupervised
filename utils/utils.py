@@ -25,12 +25,16 @@ import pymp
 
 import scipy.stats as stats
 
+import os
+
 colors = ["#FF00FF", "#3FFF00", "#00FFFF", "#FFF700", "#FF0000", "#0000FF", "#006600",
           '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', 'black',"gray"]
 # colors = px.colors.sequential.Rainbow
 
 edge_embeddings_name = ["AverageEmbedder", "HadamardEmbedder", "WeightedL1Embedder", "WeightedL2Embedder"]
 name_reduction = ["PCA", "TSNE", "UMAP"]
+
+cpu_count = os.cpu_count()
 
 def sort_df_edges(df_edges):
     s = []
@@ -295,7 +299,6 @@ def build_graph_weight_global(exp, list_groups_subgroups_t_corr, groups_id, subg
             weighted_edges = p_build_graph_weight(list_groups_subgroups_t_corr[i][j], threshold)
             df_weighted_edges = pd.DataFrame(weighted_edges, columns=["source", "target", "weight"])
             df_weighted_edges = df_weighted_edges[df_weighted_edges["weight"] != 0]
-            df_weighted_edges.reset_index(inplace=True)
 
             df_weighted_edges.to_csv("output/{}/preprocessing/edges/edges_{}_{}.csv".format(exp, groups_id[i], subgroups_id[groups_id[i]][j]), index=False)
             G = nx.from_pandas_edgelist(df_weighted_edges, "source", "target", edge_attr=["weight"])
