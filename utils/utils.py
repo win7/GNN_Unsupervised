@@ -1245,7 +1245,7 @@ def p_build_graph_weight(matrix, threshold=0.5):
         for i in p.range(len(index)):
             for j in range(i + 1, c):
                 i_ = index[i]
-                j_ = index[j]
+                j_ = columns[j]
                 if not math.isnan(matrix[i_][j_]) and abs(matrix[i_][j_]) >= threshold:
                     edges[i * c + j] = [i_, j_, matrix[i_][j_]]
     return edges

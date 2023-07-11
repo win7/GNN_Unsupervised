@@ -23,7 +23,7 @@ Files
 4. processing: generate edge-embeddings and outlier detection (ok)
 5. baseline: Greedy algorithm for get maximun common subgraph (ok)
 6. comparation: compare baseline (Greedy) with GNN (DGI, VGAE) on data variation
-7. change_detection
+7. change_detection: detect change between correlations
 8. processing_biocyc
 
 Aditional Files
@@ -44,3 +44,4 @@ Improve
 - exp4 Syntectic GNN Greedy (n=1000, p=0.5)
 - exp5 Syntectic GNN Greedy (n=1000, p=0.3) (this for manuscript)
 - exp7 improve runtimes
+- exp8 Reinhard

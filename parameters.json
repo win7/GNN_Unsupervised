@@ -1,27 +1,23 @@
 {
-    "raw_folder": "Edwin_proyecto2",
-    "exp": "exp1",
+    "raw_folder": "Edwin_proyecto3",
+    "exp": "exp8",
     "method": "vgae",
     "dimension": 3,
     "groups_id": [
-        "WT",
-        "zwf1^",
-        "pck1^"
+        "Starved",
+        "FCSglc",
+        "DMA"
     ],
     "subgroups_id": {
-        "WT": [
+        "Starved": [
             "1",
-            "2",
-            "3",
-            "4",
-            "5"
+            "2"
         ],
-        "zwf1^": [
+        "FCSglc": [
             "1",
-            "2",
-            "3"
+            "2"
         ],
-        "pck1^": [
+        "DMA": [
             "1",
             "2"
         ]
