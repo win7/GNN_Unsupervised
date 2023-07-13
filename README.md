@@ -34,7 +34,7 @@ Improve
 1. 
 ## To-Do
 - Dynamic edge embeddings operator
-- Parallel edge2vec operator
+- Parallel edge2vec operator (ok)
 - Improve mapping idx with id
 
 ## Notes
@@ -44,4 +44,5 @@ Improve
 - exp4 Syntectic GNN Greedy (n=1000, p=0.5)
 - exp5 Syntectic GNN Greedy (n=1000, p=0.3) (this for manuscript)
 - exp7 improve runtimes
-- exp8 Reinhard
+- exp8 Reinhard (1.1, 1.2, ...)
+- exp9 Reinhard (1, 2, 3, 4, ...)

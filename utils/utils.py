@@ -308,13 +308,20 @@ def build_graph_weight_global(exp, list_groups_subgroups_t_corr, groups_id, subg
         list_groups_subgroups_t_corr_g.append(list_aux)
     return list_groups_subgroups_t_corr_g
 
-def correlation_global(list_groups_subgroups_t, method="pearson"):
+def correlation_global(exp, groups_id, subgroups_id, list_groups_subgroups_t, method="pearson", plot=False):
     list_groups_subgroups_t_corr = []
-    for list_groups in tqdm(list_groups_subgroups_t):
+    for i, list_groups in tqdm(enumerate(list_groups_subgroups_t)):
         list_aux = []
-        for subgroup in tqdm(list_groups):
+        for j, subgroup in tqdm(enumerate(list_groups)):
             matrix = subgroup.corr(method=method) # pearson, kendall, spearman
             list_aux.append(matrix)
+
+            if plot:
+                plt.imshow(matrix, cmap="bwr")
+                plt.colorbar()
+                plt.savefig("output/{}/plots/correlation_{}_{}.png".format(exp, groups_id[i], subgroups_id[groups_id[i]][j]))
+                # plt.show()
+                plt.clf()
         list_groups_subgroups_t_corr.append(list_aux)
     return list_groups_subgroups_t_corr
 
